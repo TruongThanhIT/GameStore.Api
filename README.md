@@ -65,7 +65,7 @@ Handling Data Migrations.
 
 Learning by: [Thanh Truong]
 
-Connect with me on LinkedIn: [Thanh Truong]([https://google.com](https://www.linkedin.com/in/truong-thanh-973269135/))
+Connect with me on LinkedIn: [Thanh Truong](https://www.linkedin.com/in/truong-thanh-973269135)
 
 ## 📚 Credits & Learning Resources
 This project is part of my journey to master .NET 10, following the architectural patterns and best practices shared by [Julio Casal](https://www.youtube.com/@juliocasal).
