@@ -53,13 +53,13 @@ Open games.http in VS Code and click "Send Request".
 🗺 Roadmap
 [x] Phase 1: API Foundation & In-Memory Logic (Completed)
 
-[ ] Phase 2: Database Persistence (Next Step)
+[x ] Phase 2: Database Persistence (Next Step)
 
 Integrating Entity Framework Core & SQLite.
 
 Handling Data Migrations.
 
-[ ] Phase 3: Validation & Error Handling
+[ x] Phase 3: Validation & Error Handling
 
 [ ] Phase 4: Security & Authentication
 
