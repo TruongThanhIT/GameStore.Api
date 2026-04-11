@@ -85,11 +85,11 @@ Open games.http in VS Code and click "Send Request".
   * Handling Data Migrations.
 * [x] Phase 3: Validation & Error Handling
 * [ ] Phase 4: Security & Authentication
-* [ ] Phase 5: GameStore Web UI (React + Vite)
+* [x] Phase 5: GameStore Web UI (React + Vite)
   * [x] Stage 1: Project Initialization & Tooling
-  * [] Stage 2: Static UI Components
-  * [] Stage 3: API Integration
-  * [] Stage 4: Full CRUD Implementation
+  * [x] Stage 2: Static UI Components
+  * [x] Stage 3: API Integration
+  * [x] Stage 4: Full CRUD Implementation
 
 
 Learning by: [Thanh Truong]
