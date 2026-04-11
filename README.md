@@ -46,18 +46,34 @@ GameStore/
 * Node.js 20+ / npm
 
 ### Run the backend
-```bash
+# 1. Clone the repository
 git clone https://github.com/TruongThanhIT/GameStore.Api.git
 cd GameStore.Api
+
+# 2. Configuration (Optional)
+# Open 'appsettings.json' to verify the 'AllowedOrigins' 
+# Default is set to ["http://localhost:5173"] to match Vite's default port.
+
+# 3. Trust the dev certificate (First time only)
+dotnet dev-certs https --trust
+
+# 4. Run the application
 dotnet run
-```
 
 ### Run the frontend
-```bash
+# 1. Navigate to the frontend directory
 cd ../game-store-react
+
+# 2. Install dependencies
 npm install
+
+# 3. Setup environment variables
+# Copy the example file to create your local .env
+cp .env.example .env 
+# (Note: Make sure VITE_API_URL in .env matches your Backend port)
+
+# 4. Start the development server
 npm run dev
-```
 
 Test the API:
 Open games.http in VS Code and click "Send Request".
