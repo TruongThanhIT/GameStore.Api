@@ -1,4 +1,4 @@
-import type { Game } from "../models/GameModel";
+import type { Game } from "../entities/Game";
 
 interface Props {
   items: Game[];
@@ -28,7 +28,7 @@ function GameTable({ items, heading, onEdit, onDelete }: Props) {
             {items.map((item) => (
               <tr key={item.id}>
                 <td>{item.name}</td>
-                <td>{item.genre}</td>
+                <td>{item.genreName}</td>
                 <td>${item.price.toFixed(2)}</td>
                 <td>{item.releaseDate}</td>
                 <td className="text-center">

@@ -20,6 +20,7 @@ public static class GamesEndpoints
                           .Select(game => new GameSummaryDto(
                             game.Id,
                             game.Name,
+                            game.GenreId,
                             game.Genre!.Name,
                             game.Price,
                             game.ReleaseDate
