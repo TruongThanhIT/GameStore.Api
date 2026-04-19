@@ -5,33 +5,47 @@ namespace GameStore.Api.Data;
 
 public static class DataExtensions
 {
-    public static void MigrateDb(this WebApplication app)
+    public static async Task MigrateDbAsync(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<GameStoreContext>();
-        dbContext.Database.Migrate();
+
+        await dbContext.Database.MigrateAsync();
     }
 
-    public static void AddGameStoreDb(this WebApplicationBuilder builder)
+    public static IServiceCollection AddGameStoreDb(this IServiceCollection services, IConfiguration configuration)
     {
-        var connString = builder.Configuration.GetConnectionString("GameStore");
-        builder.Services.AddScoped<GameStoreContext>();
-        builder.Services.AddSqlite<GameStoreContext>(
-            connString,
-            optionsAction: options => options.UseSeeding((context, _) =>
-            {
-                if (!context.Set<Genre>().Any())
-                {
-                    context.Set<Genre>().AddRange(
-                        new Genre { Name = "Fighting" },
-                        new Genre { Name = "Action" },
-                        new Genre { Name = "Adventure" },
-                        new Genre { Name = "RPG" },
-                        new Genre { Name = "Strategy" }
-                    );
-                    context.SaveChanges();
-                }
-            })
+        var connString = configuration.GetConnectionString("GameStore")
+            ?? throw new InvalidOperationException("Connection string 'GameStore' not found.");
+
+        if (connString.Contains(".db"))
+        {
+            services.AddSqlite<GameStoreContext>(
+                connString,
+                optionsAction: options => ConfigureCommonOptions(options)
             );
+        }
+        else
+        {
+            services.AddSqlServer<GameStoreContext>(
+                connString,
+                optionsAction: options => ConfigureCommonOptions(options)
+            );
+        }
+
+        return services;
+    }
+
+    private static void ConfigureCommonOptions(DbContextOptionsBuilder options)
+    {
+        options.UseSeeding((context, _) =>
+        {
+            DbSeeder.SeedData((GameStoreContext)context);
+        });
+
+        options.UseAsyncSeeding(async (context, _, cancellationToken) =>
+        {
+            await DbSeeder.SeedDataAsync((GameStoreContext)context);
+        });
     }
 }

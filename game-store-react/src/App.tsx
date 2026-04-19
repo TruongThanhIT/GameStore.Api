@@ -25,7 +25,7 @@ function App() {
       getGames(),
       new Promise(resolve => setTimeout(resolve, 2000)) 
     ]);
-      setGames(response.data);
+      setGames(response);
     } catch (error) {
       console.error("Error fetching games:", error);
       setError("Could not load games. Is the Backend running?");
