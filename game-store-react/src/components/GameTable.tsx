@@ -30,7 +30,11 @@ function GameTable({ items, heading, onEdit, onDelete }: Props) {
                 <td>{item.name}</td>
                 <td>{item.genreName}</td>
                 <td>${item.price.toFixed(2)}</td>
-                <td>{item.releaseDate}</td>
+                <td>
+                  {new Intl.DateTimeFormat("en-NZ").format(
+                    new Date(item.releaseDate),
+                  )}
+                </td>
                 <td className="text-center">
                   <button
                     className="btn btn-outline-primary btn-sm me-2"

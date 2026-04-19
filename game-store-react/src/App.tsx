@@ -6,26 +6,31 @@ import type { Game, GameFormData } from "./entities/Game";
 import { createGame, deleteGame, getGames, updateGame } from "./api/gameClient";
 import GameForm from "./components/GameForm";
 import GameTableSkeleton from "./components/GameTableSkeleton";
+import type { PagedList } from "./entities/PagedList";
+import { PAGINATION_CONFIG } from "./constants/pagination";
+import Pagination from "./components/Pagination";
 
 function App() {
-  const [games, setGames] = useState<Game[]>([]);
+  const [pagedGames, setPagedGames] = useState<PagedList<Game> | null>(null);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedGame, setSelectedGame] = useState<Game | undefined>(undefined);
-  const [isFetching, setIsFetching] = useState(false); 
+  const [isFetching, setIsFetching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const fetchGames = async () => {
+  const fetchGames = async (
+    page: number = PAGINATION_CONFIG.DEFAULT_PAGE_NUMBER,
+  ) => {
     setIsFetching(true);
     try {
       // const response = await getGames();
       const [response] = await Promise.all([
-      getGames(),
-      new Promise(resolve => setTimeout(resolve, 2000)) 
-    ]);
-      setGames(response);
+        getGames(page, PAGINATION_CONFIG.DEFAULT_PAGE_SIZE),
+        new Promise((resolve) => setTimeout(resolve, 2000)),
+      ]);
+      setPagedGames(response);
     } catch (error) {
       console.error("Error fetching games:", error);
       setError("Could not load games. Is the Backend running?");
@@ -53,7 +58,7 @@ function App() {
       await deleteGame(id);
       setAlertMessage("Game deleted successfully!");
       setShowAlert(true);
-      await fetchGames();
+      await fetchGames(pagedGames?.pageNumber);
     } catch (error) {
       setError("Could not delete game. Please try again.");
     }
@@ -69,7 +74,7 @@ function App() {
         await createGame(data);
         setAlertMessage("Game created successfully!");
       }
-      await fetchGames();
+      await fetchGames(pagedGames?.pageNumber);
       setShowForm(false);
       setShowAlert(true);
     } catch (error) {
@@ -103,12 +108,18 @@ function App() {
             {isFetching ? (
               <GameTableSkeleton />
             ) : (
-              <GameTable
-                items={games}
-                heading="Games"
-                onEdit={handleEditGame}
-                onDelete={handleDeleteGame}
-              />
+              <>
+                <GameTable
+                  items={pagedGames?.items ?? []}
+                  heading="Games"
+                  onEdit={handleEditGame}
+                  onDelete={handleDeleteGame}
+                />
+                <Pagination
+                  metadata={pagedGames}
+                  onPageChange={(page) => fetchGames(page)}
+                />
+              </>
             )}
           </>
         )}

@@ -8,14 +8,20 @@ namespace GameStore.Api.Endpoints;
 public static class GamesEndpoints
 {
     const string GetGameEndpointName = "GetName";
-    
+
     public static void MapGamesEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/games");
 
         //GET /games
-        group.MapGet("/", async (GameStoreContext dbContext) 
-        => await dbContext.Games
+        group.MapGet("/", async (
+            int? page,
+            int? pageSize,
+            GameStoreContext dbContext) =>
+        {
+            int currPage = page ?? 1;
+            int size = pageSize ?? 10;
+            return await dbContext.Games
                           .Include(game => game.Genre)
                           .Select(game => new GameSummaryDto(
                             game.Id,
@@ -26,7 +32,8 @@ public static class GamesEndpoints
                             game.ReleaseDate
                           ))
                           .AsNoTracking()
-                          .ToListAsync());
+                          .ToPagedListAsync(currPage, size);
+        });
 
         // GET /games/1
         group.MapGet("/{id}", async (int id, GameStoreContext dbContext) =>
@@ -45,7 +52,7 @@ public static class GamesEndpoints
         .WithName(GetGameEndpointName);
 
         // POST /games
-        group.MapPost("/", async(CreateGameDto newGame, GameStoreContext dbContext) =>
+        group.MapPost("/", async (CreateGameDto newGame, GameStoreContext dbContext) =>
         {
             Game game = new()
             {
@@ -72,13 +79,13 @@ public static class GamesEndpoints
 
         // PUT /games/1
         group.MapPut("/{id}", async (
-            int id, 
-            UpdateGameDto updatedGame, 
+            int id,
+            UpdateGameDto updatedGame,
             GameStoreContext dbContext) =>
         {
             var existingGame = await dbContext.Games.FindAsync(id);
 
-            if(existingGame is null)
+            if (existingGame is null)
             {
                 return Results.NotFound();
             }
@@ -99,8 +106,8 @@ public static class GamesEndpoints
             await dbContext.Games
                             .Where(game => game.Id == id)
                             .ExecuteDeleteAsync();
-            
+
             return Results.NoContent();
-        });  
+        });
     }
 }

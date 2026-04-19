@@ -38,14 +38,20 @@ public static class DataExtensions
 
     private static void ConfigureCommonOptions(DbContextOptionsBuilder options)
     {
-        options.UseSeeding((context, _) =>
-        {
-            DbSeeder.SeedData((GameStoreContext)context);
-        });
-
         options.UseAsyncSeeding(async (context, _, cancellationToken) =>
         {
-            await DbSeeder.SeedDataAsync((GameStoreContext)context);
+            if (context is GameStoreContext gameContext)
+            {
+                await DbSeeder.SeedDataAsync(gameContext);
+            }
+        });
+
+        options.UseSeeding((context, _) =>
+        {
+            if (context is GameStoreContext gameContext)
+            {
+                DbSeeder.SeedDataAsync(gameContext).GetAwaiter().GetResult();
+            }
         });
     }
 }
