@@ -52,7 +52,7 @@ cd GameStore.Api
 
 # 2. Configuration (Optional)
 # Open 'appsettings.json' to verify the 'AllowedOrigins' 
-# Default is set to ["http://localhost:5173"] to match Vite's default port.
+# Default is set to ["http://localhost:5038"] to match Vite's default port.
 
 # 3. Trust the dev certificate (First time only)
 dotnet dev-certs https --trust
