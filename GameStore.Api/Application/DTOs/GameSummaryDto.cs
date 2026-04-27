@@ -1,3 +1,5 @@
+using MyGameStore.Domain.ValueObjects;
+
 namespace GameStore.Api.Dtos;
 
 public record GameSummaryDto(
@@ -5,6 +7,6 @@ public record GameSummaryDto(
     string Name,
     int GenreId,
     string GenreName,
-    decimal Price,
+    GamePrice Price,
     DateOnly ReleaseDate
 );

@@ -1,6 +1,7 @@
 using Bogus;
 using GameStore.Api.Data;
 using GameStore.Api.Models;
+using MyGameStore.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 public static class DbSeeder
@@ -19,7 +20,7 @@ public static class DbSeeder
 
             var gameFaker = new Faker<Game>()
                 .RuleFor(g => g.Name, f => f.Commerce.ProductName())
-                .RuleFor(g => g.Price, f => Math.Round(f.Finance.Amount(5, 100), 2))
+                .RuleFor(g => g.Price, f => new GamePrice(Math.Round(f.Finance.Amount(5, 100), 2)))
                 .RuleFor(g => g.GenreId, f => f.PickRandom(genres).Id)
                 .RuleFor(g => g.ReleaseDate, f => DateOnly.FromDateTime(f.Date.Past(10)));
 
