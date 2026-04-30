@@ -6,7 +6,7 @@ public class Game
 {
     public int Id { get; set; }
 
-    public required string Name { get; set; }
+    public required GameTitle Title { get; set; }
 
     public Genre? Genre { get; set; }
 
@@ -14,7 +14,7 @@ public class Game
 
     public required GamePrice Price { get; set; }
 
-    public DateOnly ReleaseDate { get; set; }
+    public required ReleaseDate ReleaseDate { get; set; }
 
     public bool IsAffordable(decimal userBalance) => userBalance >= Price.Amount;
 

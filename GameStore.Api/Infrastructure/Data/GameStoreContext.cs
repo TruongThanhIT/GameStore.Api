@@ -32,6 +32,25 @@ public class GameStoreContext(DbContextOptions<GameStoreContext> options) : DbCo
                      .IsRequired();
             });
 
+        modelBuilder.Entity<Game>()
+            .OwnsOne(g => g.Title, title =>
+            {
+                title.Property(t => t.Value)
+                     .HasColumnName("Title")
+                     .HasMaxLength(100)
+                     .IsRequired();
+            });
+
+        modelBuilder.Entity<Game>()
+            .OwnsOne(g => g.ReleaseDate, releaseDate =>
+            {
+                releaseDate.Property(rd => rd.Value)
+                          .HasColumnName("ReleaseDate")
+                          .IsRequired();
+            });
+
         modelBuilder.Entity<Game>().Navigation(g => g.Price).IsRequired();
+        modelBuilder.Entity<Game>().Navigation(g => g.Title).IsRequired();
+        modelBuilder.Entity<Game>().Navigation(g => g.ReleaseDate).IsRequired();
     }
 }

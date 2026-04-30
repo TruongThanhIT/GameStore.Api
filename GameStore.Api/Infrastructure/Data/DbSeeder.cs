@@ -19,10 +19,10 @@ public static class DbSeeder
             var genres = await context.Genres.ToListAsync();
 
             var gameFaker = new Faker<Game>()
-                .RuleFor(g => g.Name, f => f.Commerce.ProductName())
+                .RuleFor(g => g.Title, f => new GameTitle(f.Commerce.ProductName()))
                 .RuleFor(g => g.Price, f => new GamePrice(Math.Round(f.Finance.Amount(5, 100), 2)))
                 .RuleFor(g => g.GenreId, f => f.PickRandom(genres).Id)
-                .RuleFor(g => g.ReleaseDate, f => DateOnly.FromDateTime(f.Date.Past(10)));
+                .RuleFor(g => g.ReleaseDate, f => new ReleaseDate(DateOnly.FromDateTime(f.Date.Past(10))));
 
             await context.Games.AddRangeAsync(gameFaker.Generate(50));
             await context.SaveChangesAsync();

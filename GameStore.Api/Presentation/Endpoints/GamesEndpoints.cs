@@ -26,11 +26,11 @@ public static class GamesEndpoints
                           .Include(game => game.Genre)
                           .Select(game => new GameSummaryDto(
                             game.Id,
-                            game.Name,
+                            game.Title.Value,
                             game.GenreId,
                             game.Genre!.Name,
                             game.Price,
-                            game.ReleaseDate
+                            game.ReleaseDate.Value
                           ))
                           .AsNoTracking()
                           .ToPagedListAsync(currPage, size);
@@ -43,10 +43,10 @@ public static class GamesEndpoints
             return game is null ? Results.NotFound() : Results.Ok(
                 new GameDetailsDto(
                     game.Id,
-                    game.Name,
+                    game.Title.Value,
                     game.GenreId,
                     game.Price,
-                    game.ReleaseDate
+                    game.ReleaseDate.Value
                 )
             );
         })
@@ -57,10 +57,10 @@ public static class GamesEndpoints
         {
             Game game = new()
             {
-                Name = newGame.Name,
+                Title = new GameTitle(newGame.Name),
                 GenreId = newGame.GenreId,
                 Price = newGame.Price,
-                ReleaseDate = newGame.ReleaseDate
+                ReleaseDate = new ReleaseDate(newGame.ReleaseDate)
             };
 
             dbContext.Games.Add(game);
@@ -69,10 +69,10 @@ public static class GamesEndpoints
 
             GameDetailsDto gameDto = new(
                 game.Id,
-                game.Name,
+                game.Title.Value,
                 game.GenreId,
                 game.Price,
-                game.ReleaseDate
+                game.ReleaseDate.Value
             );
 
             return Results.CreatedAtRoute(GetGameEndpointName, new { id = gameDto.Id }, gameDto);
@@ -91,10 +91,10 @@ public static class GamesEndpoints
                 return Results.NotFound();
             }
 
-            existingGame.Name = updatedGame.Name;
+            existingGame.Title = new GameTitle(updatedGame.Name);
             existingGame.GenreId = updatedGame.GenreId;
             existingGame.Price = updatedGame.Price;
-            existingGame.ReleaseDate = updatedGame.ReleaseDate;
+            existingGame.ReleaseDate = new ReleaseDate(updatedGame.ReleaseDate);
 
             await dbContext.SaveChangesAsync();
 
