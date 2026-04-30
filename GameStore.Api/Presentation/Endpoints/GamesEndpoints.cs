@@ -1,4 +1,6 @@
 using GameStore.Api.Data;
+using GameStore.Api.Domain.Exceptions;
+using GameStore.Api.Domain.Repositories;
 using GameStore.Api.Dtos;
 using GameStore.Api.Models;
 using Microsoft.EntityFrameworkCore;
@@ -37,23 +39,30 @@ public static class GamesEndpoints
         });
 
         // GET /games/1
-        group.MapGet("/{id}", async (int id, GameStoreContext dbContext) =>
+        group.MapGet("/{id}", async (int id, IGameRepository gameRepository) =>
         {
-            var game = await dbContext.Games.FindAsync(id);
-            return game is null ? Results.NotFound() : Results.Ok(
-                new GameDetailsDto(
-                    game.Id,
-                    game.Title.Value,
-                    game.GenreId,
-                    game.Price,
-                    game.ReleaseDate.Value
-                )
-            );
+            try
+            {
+                var game = await gameRepository.GetByIdAsync(id);
+                return Results.Ok(
+                    new GameDetailsDto(
+                        game.Id,
+                        game.Title.Value,
+                        game.GenreId,
+                        game.Price,
+                        game.ReleaseDate.Value
+                    )
+                );
+            }
+            catch (GameNotFoundException)
+            {
+                return Results.NotFound();
+            }
         })
         .WithName(GetGameEndpointName);
 
         // POST /games
-        group.MapPost("/", async (CreateGameDto newGame, GameStoreContext dbContext) =>
+        group.MapPost("/", async (CreateGameDto newGame, IGameRepository gameRepository) =>
         {
             Game game = new()
             {
@@ -63,9 +72,7 @@ public static class GamesEndpoints
                 ReleaseDate = new ReleaseDate(newGame.ReleaseDate)
             };
 
-            dbContext.Games.Add(game);
-            await dbContext.SaveChangesAsync();
-
+            await gameRepository.AddAsync(game);
 
             GameDetailsDto gameDto = new(
                 game.Id,
@@ -82,33 +89,39 @@ public static class GamesEndpoints
         group.MapPut("/{id}", async (
             int id,
             UpdateGameDto updatedGame,
-            GameStoreContext dbContext) =>
+            IGameRepository gameRepository) =>
         {
-            var existingGame = await dbContext.Games.FindAsync(id);
+            try
+            {
+                var existingGame = await gameRepository.GetByIdAsync(id);
 
-            if (existingGame is null)
+                existingGame.Title = new GameTitle(updatedGame.Name);
+                existingGame.GenreId = updatedGame.GenreId;
+                existingGame.Price = updatedGame.Price;
+                existingGame.ReleaseDate = new ReleaseDate(updatedGame.ReleaseDate);
+
+                await gameRepository.UpdateAsync(existingGame);
+
+                return Results.NoContent();
+            }
+            catch (GameNotFoundException)
             {
                 return Results.NotFound();
             }
-
-            existingGame.Title = new GameTitle(updatedGame.Name);
-            existingGame.GenreId = updatedGame.GenreId;
-            existingGame.Price = updatedGame.Price;
-            existingGame.ReleaseDate = new ReleaseDate(updatedGame.ReleaseDate);
-
-            await dbContext.SaveChangesAsync();
-
-            return Results.NoContent();
         });
 
         // DELETE /games/1
-        group.MapDelete("/{id}", async (int id, GameStoreContext dbContext) =>
+        group.MapDelete("/{id}", async (int id, IGameRepository gameRepository) =>
         {
-            await dbContext.Games
-                            .Where(game => game.Id == id)
-                            .ExecuteDeleteAsync();
-
-            return Results.NoContent();
+            try
+            {
+                await gameRepository.DeleteAsync(id);
+                return Results.NoContent();
+            }
+            catch (GameNotFoundException)
+            {
+                return Results.NotFound();
+            }
         });
     }
 }

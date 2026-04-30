@@ -1,3 +1,9 @@
+using GameStore.Api.Domain;
+using GameStore.Api.Domain.Events;
+using GameStore.Api.Domain.Repositories;
+using GameStore.Api.Infrastructure;
+using GameStore.Api.Infrastructure.Events;
+using GameStore.Api.Infrastructure.Repositories;
 using GameStore.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,6 +39,11 @@ public static class DataExtensions
             );
         }
 
+        services.AddScoped<IGameRepository, GameRepository>();
+        services.AddScoped<IGenreRepository, GenreRepository>();
+        services.AddScoped<IDomainEventPublisher, DomainEventPublisher>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         return services;
     }
 
@@ -48,10 +59,8 @@ public static class DataExtensions
 
         options.UseSeeding((context, _) =>
         {
-            if (context is GameStoreContext gameContext)
-            {
-                DbSeeder.SeedDataAsync(gameContext).GetAwaiter().GetResult();
-            }
+                
         });
+        options.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
     }
 }
