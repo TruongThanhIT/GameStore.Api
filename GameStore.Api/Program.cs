@@ -1,5 +1,7 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using GameStore.Api.Application.UseCases.Games;
+using GameStore.Api.Application.UseCases.Genres;
 using GameStore.Api.Application.Validators;
 using GameStore.Api.Data;
 using GameStore.Api.Endpoints;
@@ -27,6 +29,15 @@ builder.Services.AddCors(options =>
 builder.Services.AddValidation();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateGameValidator>();
+
+// Register Use Cases
+builder.Services.AddScoped<CreateGameUseCase>();
+builder.Services.AddScoped<UpdateGameUseCase>();
+builder.Services.AddScoped<GetGameByIdUseCase>();
+builder.Services.AddScoped<ListGamesUseCase>();
+builder.Services.AddScoped<DeleteGameUseCase>();
+builder.Services.AddScoped<GetGenresUseCase>();
+
 builder.Services.AddGameStoreDb(builder.Configuration);
 var app = builder.Build();
 app.UseCors();

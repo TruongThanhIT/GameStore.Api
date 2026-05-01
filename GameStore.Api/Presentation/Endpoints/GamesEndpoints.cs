@@ -1,4 +1,5 @@
 using GameStore.Api.Application.Mappings;
+using GameStore.Api.Application.UseCases.Games;
 using GameStore.Api.Data;
 using GameStore.Api.Domain.Exceptions;
 using GameStore.Api.Domain.Repositories;
@@ -21,24 +22,20 @@ public static class GamesEndpoints
         group.MapGet("/", async (
             int? page,
             int? pageSize,
-            GameStoreContext dbContext) =>
+            ListGamesUseCase listGamesUseCase) =>
         {
             int currPage = page ?? 1;
             int size = pageSize ?? 10;
-            return await dbContext.Games
-                          .Include(game => game.Genre)
-                          .Select(game => game.ToGameSummaryDto())
-                          .AsNoTracking()
-                          .ToPagedListAsync(currPage, size);
+            return await listGamesUseCase.ExecuteAsync(currPage, size);
         });
 
         // GET /games/1
-        group.MapGet("/{id}", async (int id, IGameRepository gameRepository) =>
+        group.MapGet("/{id}", async (int id, GetGameByIdUseCase getGameByIdUseCase) =>
         {
             try
             {
-                var game = await gameRepository.GetByIdAsync(id);
-                return Results.Ok(game.ToGameDetailsDto());
+                var gameDto = await getGameByIdUseCase.ExecuteAsync(id);
+                return Results.Ok(gameDto);
             }
             catch (GameNotFoundException)
             {
@@ -48,14 +45,9 @@ public static class GamesEndpoints
         .WithName(GetGameEndpointName);
 
         // POST /games
-        group.MapPost("/", async (CreateGameDto newGame, IGameRepository gameRepository) =>
+        group.MapPost("/", async (CreateGameDto newGame, CreateGameUseCase createGameUseCase) =>
         {
-            Game game = newGame.ToGame();
-
-            await gameRepository.AddAsync(game);
-
-            GameDetailsDto gameDto = game.ToGameDetailsDto();
-
+            var gameDto = await createGameUseCase.ExecuteAsync(newGame);
             return Results.CreatedAtRoute(GetGameEndpointName, new { id = gameDto.Id }, gameDto);
         });
 
@@ -63,16 +55,11 @@ public static class GamesEndpoints
         group.MapPut("/{id}", async (
             int id,
             UpdateGameDto updatedGame,
-            IGameRepository gameRepository) =>
+            UpdateGameUseCase updateGameUseCase) =>
         {
             try
             {
-                var existingGame = await gameRepository.GetByIdAsync(id);
-
-                updatedGame.UpdateGame(existingGame);
-
-                await gameRepository.UpdateAsync(existingGame);
-
+                await updateGameUseCase.ExecuteAsync(id, updatedGame);
                 return Results.NoContent();
             }
             catch (GameNotFoundException)
@@ -82,11 +69,11 @@ public static class GamesEndpoints
         });
 
         // DELETE /games/1
-        group.MapDelete("/{id}", async (int id, IGameRepository gameRepository) =>
+        group.MapDelete("/{id}", async (int id, DeleteGameUseCase deleteGameUseCase) =>
         {
             try
             {
-                await gameRepository.DeleteAsync(id);
+                await deleteGameUseCase.ExecuteAsync(id);
                 return Results.NoContent();
             }
             catch (GameNotFoundException)

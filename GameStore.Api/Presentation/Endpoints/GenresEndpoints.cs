@@ -1,4 +1,5 @@
 using GameStore.Api.Application.Mappings;
+using GameStore.Api.Application.UseCases.Genres;
 using GameStore.Api.Data;
 using GameStore.Api.Domain.Repositories;
 using GameStore.Api.Dtos;
@@ -13,10 +14,9 @@ public static class GenresEndpoints
         var group = app.MapGroup("/genres");
 
         // GET /genres
-        group.MapGet("/", async (IGenreRepository genreRepository) =>
+        group.MapGet("/", async (GetGenresUseCase getGenresUseCase) =>
         {
-            var genres = await genreRepository.GetAllAsync();
-            return genres.Select(genre => genre.ToGenreDto());
+            return await getGenresUseCase.ExecuteAsync();
         });
     }
 }
