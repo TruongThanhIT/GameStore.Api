@@ -1,3 +1,4 @@
+using GameStore.Api.Application.Mappings;
 using GameStore.Api.Data;
 using GameStore.Api.Domain.Exceptions;
 using GameStore.Api.Domain.Repositories;
@@ -26,14 +27,7 @@ public static class GamesEndpoints
             int size = pageSize ?? 10;
             return await dbContext.Games
                           .Include(game => game.Genre)
-                          .Select(game => new GameSummaryDto(
-                            game.Id,
-                            game.Title.Value,
-                            game.GenreId,
-                            game.Genre!.Name,
-                            game.Price,
-                            game.ReleaseDate.Value
-                          ))
+                          .Select(game => game.ToGameSummaryDto())
                           .AsNoTracking()
                           .ToPagedListAsync(currPage, size);
         });
@@ -44,15 +38,7 @@ public static class GamesEndpoints
             try
             {
                 var game = await gameRepository.GetByIdAsync(id);
-                return Results.Ok(
-                    new GameDetailsDto(
-                        game.Id,
-                        game.Title.Value,
-                        game.GenreId,
-                        game.Price,
-                        game.ReleaseDate.Value
-                    )
-                );
+                return Results.Ok(game.ToGameDetailsDto());
             }
             catch (GameNotFoundException)
             {
@@ -64,23 +50,11 @@ public static class GamesEndpoints
         // POST /games
         group.MapPost("/", async (CreateGameDto newGame, IGameRepository gameRepository) =>
         {
-            Game game = new()
-            {
-                Title = new GameTitle(newGame.Name),
-                GenreId = newGame.GenreId,
-                Price = newGame.Price,
-                ReleaseDate = new ReleaseDate(newGame.ReleaseDate)
-            };
+            Game game = newGame.ToGame();
 
             await gameRepository.AddAsync(game);
 
-            GameDetailsDto gameDto = new(
-                game.Id,
-                game.Title.Value,
-                game.GenreId,
-                game.Price,
-                game.ReleaseDate.Value
-            );
+            GameDetailsDto gameDto = game.ToGameDetailsDto();
 
             return Results.CreatedAtRoute(GetGameEndpointName, new { id = gameDto.Id }, gameDto);
         });
@@ -95,10 +69,7 @@ public static class GamesEndpoints
             {
                 var existingGame = await gameRepository.GetByIdAsync(id);
 
-                existingGame.Title = new GameTitle(updatedGame.Name);
-                existingGame.GenreId = updatedGame.GenreId;
-                existingGame.Price = updatedGame.Price;
-                existingGame.ReleaseDate = new ReleaseDate(updatedGame.ReleaseDate);
+                updatedGame.UpdateGame(existingGame);
 
                 await gameRepository.UpdateAsync(existingGame);
 
