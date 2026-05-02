@@ -5,13 +5,16 @@ using GameStore.Api.Application.Services.Genres;
 using GameStore.Api.Application.UseCases.Games;
 using GameStore.Api.Application.UseCases.Genres;
 using GameStore.Api.Application.Validators;
+using GameStore.Api.Configuration;
 using GameStore.Api.Data;
 using GameStore.Api.Endpoints;
 using GameStore.Api.Presentation.Middleware;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
-var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+var appConfig = builder.Configuration.Get<ApplicationConfiguration>() ?? new ApplicationConfiguration();
+var allowedOrigins = appConfig.AllowedOrigins;
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -22,32 +25,26 @@ builder.Services.AddCors(options =>
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         }
-        else if(builder.Environment.IsDevelopment())
+        else
         {
             policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
         }
     });
 });
+
+builder.Services.AddApplicationConfiguration(builder.Configuration);
+
 builder.Services.AddValidation();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateGameValidator>();
 
-// Register Use Cases
-builder.Services.AddScoped<CreateGameUseCase>();
-builder.Services.AddScoped<UpdateGameUseCase>();
-builder.Services.AddScoped<GetGameByIdUseCase>();
-builder.Services.AddScoped<ListGamesUseCase>();
-builder.Services.AddScoped<DeleteGameUseCase>();
-builder.Services.AddScoped<GetGenresUseCase>();
-
-builder.Services.AddScoped<IGameApplicationService, GameApplicationService>();
-builder.Services.AddScoped<IGenreApplicationService, GenreApplicationService>();
+builder.Services.AddApplicationDependencies();
 
 builder.Services.AddGameStoreDb(builder.Configuration);
 builder.Services.AddOpenApi();
 var app = builder.Build();
 
-if(app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
