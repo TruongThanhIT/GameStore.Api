@@ -1,13 +1,5 @@
-using GameStore.Api.Application.Common;
-using GameStore.Api.Application.Mappings;
 using GameStore.Api.Application.Services.Games;
-using GameStore.Api.Data;
-using GameStore.Api.Domain.Exceptions;
-using GameStore.Api.Domain.Repositories;
 using GameStore.Api.Dtos;
-using GameStore.Api.Models;
-using Microsoft.EntityFrameworkCore;
-using MyGameStore.Domain.ValueObjects;
 
 namespace GameStore.Api.Endpoints;
 

@@ -1,6 +1,5 @@
 using GameStore.Api.Application.Common;
 using GameStore.Api.Dtos;
-using GameStore.Api.Models;
 
 namespace GameStore.Api.Application.Services.Games;
 

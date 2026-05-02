@@ -1,5 +1,4 @@
 using GameStore.Api.Application.Mappings;
-using GameStore.Api.Domain.Exceptions;
 using GameStore.Api.Domain.Repositories;
 using GameStore.Api.Dtos;
 

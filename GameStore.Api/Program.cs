@@ -7,8 +7,7 @@ using GameStore.Api.Application.UseCases.Genres;
 using GameStore.Api.Application.Validators;
 using GameStore.Api.Data;
 using GameStore.Api.Endpoints;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
+using GameStore.Api.Presentation.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
@@ -45,6 +44,9 @@ builder.Services.AddScoped<IGenreApplicationService, GenreApplicationService>();
 
 builder.Services.AddGameStoreDb(builder.Configuration);
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseCors();
 
 app.MapGamesEndpoints();

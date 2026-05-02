@@ -1,4 +1,3 @@
-using GameStore.Api.Domain.Exceptions;
 using GameStore.Api.Domain.Repositories;
 
 namespace GameStore.Api.Application.UseCases.Games;
