@@ -1,5 +1,6 @@
 using GameStore.Api.Application.Services.Games;
 using GameStore.Api.Dtos;
+using GameStore.Api.Presentation.Middleware;
 
 namespace GameStore.Api.Endpoints;
 
@@ -39,7 +40,8 @@ public static class GamesEndpoints
             return result.IsSuccess
                 ? Results.CreatedAtRoute(GetGameEndpointName, new { id = result.Value.Id }, result.Value)
                 : Results.BadRequest(result.Error);
-        });
+        })
+        .WithValidation<CreateGameDto>();
 
         // PUT /games/1
         group.MapPut("/{id}", async (
@@ -51,7 +53,8 @@ public static class GamesEndpoints
             return result.IsSuccess
                 ? Results.NoContent()
                 : Results.NotFound(result.Error);
-        });
+        })
+        .WithValidation<UpdateGameDto>();
 
         // DELETE /games/1
         group.MapDelete("/{id}", async (int id, IGameApplicationService gameService) =>
