@@ -1,5 +1,5 @@
 using GameStore.Api.Application.Mappings;
-using GameStore.Api.Application.UseCases.Games;
+using GameStore.Api.Application.Services.Games;
 using GameStore.Api.Data;
 using GameStore.Api.Domain.Exceptions;
 using GameStore.Api.Domain.Repositories;
@@ -22,19 +22,19 @@ public static class GamesEndpoints
         group.MapGet("/", async (
             int? page,
             int? pageSize,
-            ListGamesUseCase listGamesUseCase) =>
+            IGameApplicationService gameService) =>
         {
             int currPage = page ?? 1;
             int size = pageSize ?? 10;
-            return await listGamesUseCase.ExecuteAsync(currPage, size);
+            return await gameService.ListGamesAsync(currPage, size);
         });
 
         // GET /games/1
-        group.MapGet("/{id}", async (int id, GetGameByIdUseCase getGameByIdUseCase) =>
+        group.MapGet("/{id}", async (int id, IGameApplicationService gameService) =>
         {
             try
             {
-                var gameDto = await getGameByIdUseCase.ExecuteAsync(id);
+                var gameDto = await gameService.GetGameByIdAsync(id);
                 return Results.Ok(gameDto);
             }
             catch (GameNotFoundException)
@@ -45,9 +45,9 @@ public static class GamesEndpoints
         .WithName(GetGameEndpointName);
 
         // POST /games
-        group.MapPost("/", async (CreateGameDto newGame, CreateGameUseCase createGameUseCase) =>
+        group.MapPost("/", async (CreateGameDto newGame, IGameApplicationService gameService) =>
         {
-            var gameDto = await createGameUseCase.ExecuteAsync(newGame);
+            var gameDto = await gameService.CreateGameAsync(newGame);
             return Results.CreatedAtRoute(GetGameEndpointName, new { id = gameDto.Id }, gameDto);
         });
 
@@ -55,11 +55,11 @@ public static class GamesEndpoints
         group.MapPut("/{id}", async (
             int id,
             UpdateGameDto updatedGame,
-            UpdateGameUseCase updateGameUseCase) =>
+            IGameApplicationService gameService) =>
         {
             try
             {
-                await updateGameUseCase.ExecuteAsync(id, updatedGame);
+                await gameService.UpdateGameAsync(id, updatedGame);
                 return Results.NoContent();
             }
             catch (GameNotFoundException)
@@ -69,11 +69,11 @@ public static class GamesEndpoints
         });
 
         // DELETE /games/1
-        group.MapDelete("/{id}", async (int id, DeleteGameUseCase deleteGameUseCase) =>
+        group.MapDelete("/{id}", async (int id, IGameApplicationService gameService) =>
         {
             try
             {
-                await deleteGameUseCase.ExecuteAsync(id);
+                await gameService.DeleteGameAsync(id);
                 return Results.NoContent();
             }
             catch (GameNotFoundException)
