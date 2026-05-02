@@ -22,7 +22,7 @@ builder.Services.AddCors(options =>
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         }
-        else
+        else if(builder.Environment.IsDevelopment())
         {
             policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
         }
