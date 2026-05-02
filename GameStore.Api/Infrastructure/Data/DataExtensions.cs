@@ -4,7 +4,6 @@ using GameStore.Api.Domain.Repositories;
 using GameStore.Api.Infrastructure;
 using GameStore.Api.Infrastructure.Events;
 using GameStore.Api.Infrastructure.Repositories;
-using GameStore.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.Api.Data;

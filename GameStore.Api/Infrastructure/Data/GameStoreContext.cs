@@ -1,7 +1,6 @@
 using GameStore.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using System;
 using GameStore.Api.Infrastructure.Configruations;
 
 namespace GameStore.Api.Data;

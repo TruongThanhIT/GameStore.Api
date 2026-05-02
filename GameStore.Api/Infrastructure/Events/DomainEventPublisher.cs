@@ -1,5 +1,4 @@
 using GameStore.Api.Domain.Events;
-using Microsoft.Extensions.Logging;
 
 namespace GameStore.Api.Infrastructure.Events;
 

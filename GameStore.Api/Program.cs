@@ -45,6 +45,8 @@ builder.Services.AddScoped<IGenreApplicationService, GenreApplicationService>();
 builder.Services.AddGameStoreDb(builder.Configuration);
 var app = builder.Build();
 
+app.UseMiddleware<RequestLoggingMiddleware>();
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseCors();

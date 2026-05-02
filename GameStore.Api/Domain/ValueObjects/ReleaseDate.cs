@@ -1,5 +1,3 @@
-using System;
-
 namespace MyGameStore.Domain.ValueObjects
 {
     public record ReleaseDate
