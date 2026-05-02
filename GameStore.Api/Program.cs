@@ -8,6 +8,7 @@ using GameStore.Api.Application.Validators;
 using GameStore.Api.Data;
 using GameStore.Api.Endpoints;
 using GameStore.Api.Presentation.Middleware;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
@@ -43,7 +44,14 @@ builder.Services.AddScoped<IGameApplicationService, GameApplicationService>();
 builder.Services.AddScoped<IGenreApplicationService, GenreApplicationService>();
 
 builder.Services.AddGameStoreDb(builder.Configuration);
+builder.Services.AddOpenApi();
 var app = builder.Build();
+
+if(app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
 app.UseMiddleware<RequestLoggingMiddleware>();
 
