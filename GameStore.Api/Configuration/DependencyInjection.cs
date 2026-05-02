@@ -2,8 +2,6 @@ using GameStore.Api.Application.Services.Genres;
 using GameStore.Api.Application.Services.Games;
 using GameStore.Api.Application.UseCases.Games;
 using GameStore.Api.Application.UseCases.Genres;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GameStore.Api.Configuration;
 
