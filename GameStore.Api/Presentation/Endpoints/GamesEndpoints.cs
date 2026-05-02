@@ -1,3 +1,4 @@
+using GameStore.Api.Application.Common;
 using GameStore.Api.Application.Mappings;
 using GameStore.Api.Application.Services.Games;
 using GameStore.Api.Data;
@@ -32,23 +33,20 @@ public static class GamesEndpoints
         // GET /games/1
         group.MapGet("/{id}", async (int id, IGameApplicationService gameService) =>
         {
-            try
-            {
-                var gameDto = await gameService.GetGameByIdAsync(id);
-                return Results.Ok(gameDto);
-            }
-            catch (GameNotFoundException)
-            {
-                return Results.NotFound();
-            }
+            var result = await gameService.GetGameByIdAsync(id);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : Results.NotFound(result.Error);
         })
         .WithName(GetGameEndpointName);
 
         // POST /games
         group.MapPost("/", async (CreateGameDto newGame, IGameApplicationService gameService) =>
         {
-            var gameDto = await gameService.CreateGameAsync(newGame);
-            return Results.CreatedAtRoute(GetGameEndpointName, new { id = gameDto.Id }, gameDto);
+            var result = await gameService.CreateGameAsync(newGame);
+            return result.IsSuccess
+                ? Results.CreatedAtRoute(GetGameEndpointName, new { id = result.Value.Id }, result.Value)
+                : Results.BadRequest(result.Error);
         });
 
         // PUT /games/1
@@ -57,29 +55,19 @@ public static class GamesEndpoints
             UpdateGameDto updatedGame,
             IGameApplicationService gameService) =>
         {
-            try
-            {
-                await gameService.UpdateGameAsync(id, updatedGame);
-                return Results.NoContent();
-            }
-            catch (GameNotFoundException)
-            {
-                return Results.NotFound();
-            }
+            var result = await gameService.UpdateGameAsync(id, updatedGame);
+            return result.IsSuccess
+                ? Results.NoContent()
+                : Results.NotFound(result.Error);
         });
 
         // DELETE /games/1
         group.MapDelete("/{id}", async (int id, IGameApplicationService gameService) =>
         {
-            try
-            {
-                await gameService.DeleteGameAsync(id);
-                return Results.NoContent();
-            }
-            catch (GameNotFoundException)
-            {
-                return Results.NotFound();
-            }
+            var result = await gameService.DeleteGameAsync(id);
+            return result.IsSuccess
+                ? Results.NoContent()
+                : Results.NotFound(result.Error);
         });
     }
 }

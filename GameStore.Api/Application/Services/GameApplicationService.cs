@@ -1,4 +1,6 @@
+using GameStore.Api.Application.Common;
 using GameStore.Api.Application.UseCases.Games;
+using GameStore.Api.Domain.Exceptions;
 using GameStore.Api.Dtos;
 using GameStore.Api.Models;
 
@@ -15,15 +17,55 @@ public class GameApplicationService(
     public Task<PagedList<GameSummaryDto>> ListGamesAsync(int pageNumber, int pageSize)
         => listGamesUseCase.ExecuteAsync(pageNumber, pageSize);
 
-    public Task<GameDetailsDto> GetGameByIdAsync(int id)
-        => getGameByIdUseCase.ExecuteAsync(id);
+    public async Task<Result<GameDetailsDto>> GetGameByIdAsync(int id)
+    {
+        try
+        {
+            var gameDto = await getGameByIdUseCase.ExecuteAsync(id);
+            return Result<GameDetailsDto>.Success(gameDto);
+        }
+        catch (GameNotFoundException ex)
+        {
+            return Result<GameDetailsDto>.Failure(ex.Message);
+        }
+    }
 
-    public Task<GameDetailsDto> CreateGameAsync(CreateGameDto dto)
-        => createGameUseCase.ExecuteAsync(dto);
+    public async Task<Result<GameDetailsDto>> CreateGameAsync(CreateGameDto dto)
+    {
+        try
+        {
+            var gameDto = await createGameUseCase.ExecuteAsync(dto);
+            return Result<GameDetailsDto>.Success(gameDto);
+        }
+        catch (Exception ex)
+        {
+            return Result<GameDetailsDto>.Failure(ex.Message);
+        }
+    }
 
-    public Task UpdateGameAsync(int id, UpdateGameDto dto)
-        => updateGameUseCase.ExecuteAsync(id, dto);
+    public async Task<Result> UpdateGameAsync(int id, UpdateGameDto dto)
+    {
+        try
+        {
+            await updateGameUseCase.ExecuteAsync(id, dto);
+            return Result.Success();
+        }
+        catch (GameNotFoundException ex)
+        {
+            return Result.Failure(ex.Message);
+        }
+    }
 
-    public Task DeleteGameAsync(int id)
-        => deleteGameUseCase.ExecuteAsync(id);
+    public async Task<Result> DeleteGameAsync(int id)
+    {
+        try
+        {
+            await deleteGameUseCase.ExecuteAsync(id);
+            return Result.Success();
+        }
+        catch (GameNotFoundException ex)
+        {
+            return Result.Failure(ex.Message);
+        }
+    }
 }
