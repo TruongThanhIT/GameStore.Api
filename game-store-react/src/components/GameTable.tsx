@@ -29,7 +29,9 @@ function GameTable({ items, heading, onEdit, onDelete }: Props) {
               <tr key={item.id}>
                 <td>{item.name}</td>
                 <td>{item.genreName}</td>
-                <td>${item.price.toFixed(2)}</td>
+                <td>
+                  {item.price.amount.toFixed(2)} {item.price.currency}
+                </td>
                 <td>
                   {new Intl.DateTimeFormat("en-NZ").format(
                     new Date(item.releaseDate),
